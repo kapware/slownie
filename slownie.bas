@@ -259,9 +259,9 @@ koniec2:
 end function
 
 
-function SlownieZL100GR(kwota)
+function Slownie100Waluta(kwota, waluta)
 	if kwota>=1000000000 or kwota<=-1000000000 then
-		SlownieZL100GR="za duża lub błędna liczba (" & cstr(kwota) & ")"
+		Slownie100Waluta="za duża lub błędna liczba (" & cstr(kwota) & ")"
 		goto koniec3
 	end if
 
@@ -280,14 +280,8 @@ function SlownieZL100GR(kwota)
 	end if
 	
 	s = s & slownie(zl)
-	select case Slownie000(zl mod 1000)
-		case 1
-			s = s & " złoty"
-		case 2
-			s = s & " złote"
-		case 0,3
-			s = s & " złotych"
-	end select
+	s = s & " " & waluta
+
 	if true or gr <> 0 then
 		s = s & " " 
 		if gr<10 then
@@ -295,8 +289,112 @@ function SlownieZL100GR(kwota)
 		end if
 		s = s & cstr(gr) & "/100"
 	end if
-	SlownieZL100GR=s
+	Slownie100Waluta=s
 koniec3:
 end function
+
+rem vim:ts=4:ft=vb
+
+
+Function NumToWords( ByVal nNumber As Double, nCurrency) As String
+   cWords = ""
+   
+   If nNumber < 0 Then
+      cWords = "Negative " + NumToWords( -1 * nNumber, nCurrency )
+   
+   ElseIf nNumber <> Int( nNumber ) Then
+      cWords = NumToWords( Int( nNumber ), "" )
+      cWords = cWords + " "
+      nFrac = nNumber - Int( nNumber )
+      
+      nFrac = fix((nFrac*100)mod 100)
+      
+      s = s & " " 
+	  if nFrac < 10 then
+	     s = s & "0"
+      end if
+
+      s = s & cstr(nFrac) & "/100"
+      
+      cWords = cWords + " " + nCurrency + s
+   
+   ElseIf nNumber < 20 Then
+      Select Case nNumber
+         Case 0: cWords = "zero"
+         Case 1: cWords = "one"
+         Case 2: cWords = "two"
+         Case 3: cWords = "three"
+         Case 4: cWords = "four"
+         Case 5: cWords = "five"
+         Case 6: cWords = "six"
+         Case 7: cWords = "seven"
+         Case 8: cWords = "eight"
+         Case 9: cWords = "nine"
+         Case 10: cWords = "ten"
+         Case 11: cWords = "eleven"
+         Case 12: cWords = "twelve"
+         Case 13: cWords = "thirteen"
+         Case 14: cWords = "fourteen"
+         Case 15: cWords = "fifteen"
+         Case 16: cWords = "sixteen"
+         Case 17: cWords = "seventeen"
+         Case 18: cWords = "eighteen"
+         Case 19: cWords = "ninteen"
+      End Select
+      
+      If nCurrency <> "" Then
+         cWords = cWords + " " + nCurrency + " 0/100"
+      End If
+   
+   ElseIf nNumber < 100 Then
+      nTensPlace = Int( nNumber / 10 )
+      nOnesPlace = nNumber Mod 10
+      Select Case nTensPlace * 10
+         Case 20: cWords = "twenty"
+         Case 30: cWords = "thirty"
+         Case 40: cWords = "forty"
+         Case 50: cWords = "fifty"
+         Case 60: cWords = "sixty"
+         Case 70: cWords = "seventy"
+         Case 80: cWords = "eighty"
+         Case 90: cWords = "ninty"
+      End Select
+      If nOnesPlace > 0 Then
+         cWords = cWords + " " + NumToWords( nOnesPlace, "" )
+      EndIf
+      
+      If nCurrency <> "" Then
+         cWords = cWords + " " + nCurrency + " 0/100"
+      End If
+   
+   ElseIf nNumber < 1000 Then
+      nHundredsPlace = Int( nNumber / 100 )
+      nRest = nNumber Mod 100
+      cWords = NumToWords( nHundredsPlace, "" )
+      cWords = cWords + " hundred"
+      If nRest > 0 Then
+         cWords = cWords + " " + NumToWords( nRest, "" )
+      EndIf
+      
+      If nCurrency <> "" Then
+         cWords = cWords + " " + nCurrency + " 0/100"
+      End If
+   
+   ElseIf nNumber < 1000000 Then
+      nThousands = Int( nNumber / 1000 )
+      nRest = nNumber Mod 1000
+      cWords = NumToWords( nThousands, "" )
+      cWords = cWords + " thousand"
+      If nRest > 0 Then
+         cWords = cWords + " " + NumToWords( nRest, "" )
+      EndIf
+
+      If nCurrency <> "" Then
+         cWords = cWords + " " + nCurrency + " 0/100"
+      End If
+   EndIf
+   
+   NumToWords() = cWords
+End Function
 
 rem vim:ts=4:ft=vb
